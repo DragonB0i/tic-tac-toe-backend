@@ -12,9 +12,12 @@ RUN chmod +x ./mvnw
 # Copy the rest of your application's source code
 COPY src ./src
 
-# --- THIS IS THE FINAL FIX ---
-# This command forces a clean build to prevent packaging errors.
+# Build the standard jar file
 RUN ./mvnw clean package -DskipTests
+
+# --- THIS IS THE LAST RESORT ---
+# Explicitly force the spring-boot plugin to repackage the jar correctly
+RUN ./mvnw spring-boot:repackage
 
 # Render's required port for web services
 EXPOSE 10000
