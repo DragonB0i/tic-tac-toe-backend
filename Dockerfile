@@ -1,26 +1,31 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim
+# --- STAGE 1: The Build Environment ---
+# This stage is like a temporary workshop just for building the .jar file.
+FROM openjdk:17-jdk-slim AS build
 
-# Set a working directory inside the container
 WORKDIR /app
 
-# Copy the Maven wrapper files and build the project
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 RUN chmod +x ./mvnw
 
-# Copy the rest of your application's source code
 COPY src ./src
 
-# Build the standard jar file
+# This command will now correctly build the full, executable .jar file
 RUN ./mvnw clean package -DskipTests
 
-# --- THIS IS THE LAST RESORT ---
-# Explicitly force the spring-boot plugin to repackage the jar correctly
-RUN ./mvnw spring-boot:repackage
 
-# Render's required port for web services
+# --- STAGE 2: The Final, Runtime Environment ---
+# This stage is the clean, final container that will actually run the game.
+FROM openjdk:17-jre-slim
+
+WORKDIR /app
+
+# This command copies ONLY the finished .jar file from the 'build' workshop.
+COPY --from=build /app/target/*.jar app.jar
+
+# Render requires this port for web services
 EXPOSE 10000
 
-# The standard command to run the application
-ENTRYPOINT ["java", "-jar", "target/demo-0.0.1-SNAPSHOT.jar"]
+# This is the final, simple command to run your game.
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
