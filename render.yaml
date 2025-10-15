@@ -1,0 +1,49 @@
+# This file is an instruction manual for Render.com
+
+services:
+  # This section defines your Spring Boot web service (your game)
+  - type: web
+    name: tictactoe-game # You can change this public name if you want
+    runtime: java
+    plan: free
+    buildCommand: "./mvnw package"
+    startCommand: "java -jar target/demo-0.0.1-SNAPSHOT.jar"
+    envVars:
+      - key: JAVA_VERSION
+        value: 17
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: tictactoe-db # IMPORTANT: Replace this with the name of YOUR Render database
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: tictactoe-db # IMPORTANT: Replace this with the name of YOUR Render database
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: tictactoe-db # IMPORTANT: Replace this with the name of YOUR Render database
+          property: password
+```
+
+**Crucial Action:** Look at the three lines that say `name: tictactoe-db`. You **must** replace `tictactoe-db` with the actual name you gave your PostgreSQL database on Render.
+
+---
+
+### **Step 2: Push the Blueprint to GitHub**
+
+Now, we need to upload this new instruction file to your GitHub repository so Render can see it.
+
+1.  Open Git Bash in your project's root directory.
+2.  Run these three commands one by one:
+
+    ```bash
+    # 1. Add the new render.yaml file
+    git add render.yaml
+
+    # 2. Save the change with a clear message
+    git commit -m "Add render.yaml blueprint for foolproof deployment"
+
+    # 3. Push this new commit to GitHub
+    git push
+    
+
