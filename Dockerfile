@@ -8,7 +8,11 @@ WORKDIR /app
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 
-# Download dependencies
+# --- THE FIX IS HERE ---
+# Manually give the mvnw script permission to execute inside the container
+RUN chmod +x ./mvnw
+
+# Now that it has permission, download dependencies
 RUN ./mvnw dependency:go-offline
 
 # Copy the rest of your application's source code
