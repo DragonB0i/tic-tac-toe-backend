@@ -16,7 +16,8 @@ RUN ./mvnw clean package -DskipTests
 
 # --- STAGE 2: The Final, Runtime Environment ---
 # This stage is the clean, final container that will actually run the game.
-FROM openjdk:17-jre-slim
+# THIS IS THE ONE-LINE FIX: We use 'jdk-slim' instead of the non-existent 'jre-slim'
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
@@ -28,4 +29,3 @@ EXPOSE 10000
 
 # This is the final, simple command to run your game.
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
