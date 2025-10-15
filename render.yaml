@@ -1,23 +1,23 @@
 services:
-  # This section defines your Spring Boot web service (your game)
   - type: web
-    name: tictactoe-game # You can change this public name if you want
-    runtime: java
+    name: tictactoe-game 
+    # We remove the faulty 'runtime' line. Render will now correctly infer Java from the build command.
     plan: free
-    buildCommand: "./mvnw package"
+    # CORRECTED: This command first gives permission, then builds.
+    buildCommand: "chmod +x ./mvnw && ./mvnw package"
     startCommand: "java -jar target/demo-0.0.1-SNAPSHOT.jar"
     envVars:
       - key: JAVA_VERSION
         value: 17
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
-          name: tictactoe-db # IMPORTANT: Replace this with the name of YOUR Render database
+          name: tictactoe-db # IMPORTANT: Make sure this is the name of YOUR Render database
           property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
-          name: tictactoe-db # IMPORTANT: Replace this with the name of YOUR Render database
+          name: tictactoe-db # IMPORTANT: Make sure this is the name of YOUR Render database
           property: user
       - key: SPRING_DATASOURCE_PASSWORD
         fromDatabase:
-          name: tictactoe-db # IMPORTANT: Replace this with the name of YOUR Render database
+          name: tictactoe-db # IMPORTANT: Make sure this is the name of YOUR Render database
           property: password
