@@ -1,28 +1,25 @@
-# Use an official OpenJDK runtime as a parent image
 FROM openjdk:17-jdk-slim
 
 # Set a working directory inside the container
 WORKDIR /app
 
-# Copy the Maven wrapper files
+# Copy the Maven wrapper files and build the project
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
-
-# --- THE FIX IS HERE ---
-# Manually give the mvnw script permission to execute inside the container
 RUN chmod +x ./mvnw
-
-# Now that it has permission, download dependencies
 RUN ./mvnw dependency:go-offline
-
-# Copy the rest of your application's source code
 COPY src ./src
-
-# Build the application .jar file
 RUN ./mvnw package -DskipTests
 
-# Expose port 8080 to the outside world
+# Expose port 8080
 EXPOSE 8080
 
-# The command to run your application
-ENTRYPOINT ["java", "-jar", "target/demo-0.0.1-SNAPSHOT.jar"]
+# --- THE FINAL FIX IS HERE ---
+# This command manually overrides the settings at startup.
+# It uses the environment variables we set on Render.
+ENTRYPOINT ["java", \
+            "-Dspring.datasource.url=${SPRING_DATASOURCE_URL}", \
+            "-Dspring.datasource.username=${SPRING_DATASOURCE_USERNAME}", \
+            "-Dspring.datasource.password=${SPRING_DATASOURCE_PASSWORD}", \
+            "-Dspring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect", \
+            "-jar", "target/demo-0.0.1-SNAPSHOT.jar"]
